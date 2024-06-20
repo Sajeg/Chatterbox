@@ -10,9 +10,17 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import org.sajeg.chatterbox.ui.theme.ChatterboxTheme
+
 
 
 class MainActivity : ComponentActivity() {
@@ -27,10 +35,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             ChatterboxTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    var modifier = Modifier.padding(innerPadding)
-//                    Button(modifier = modifier,
-//                        onClick = { LLMManager.addChatMessage("What do I need to keep in mind when working with android Studio?") }) {
-//                    }
+                    val modifier = Modifier.padding(innerPadding)
+                    MainComposable(modifier)
                 }
             }
             TTSManager.initialize(this)
@@ -75,8 +81,19 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
         proximitySensor.stopListing()
     }
-}
 
-fun speechOderSo() {
-    SpeechManager.startRecognition()
+    @Composable
+    fun MainComposable(modifier: Modifier){
+        var gladosMode: Boolean by remember {
+            mutableStateOf(false)
+        }
+
+        Button(modifier = modifier,
+            content = { Text(text = gladosMode.toString()) },
+            onClick = {
+                gladosMode = LLMManager.toggleGlados()
+                SpeechManager.gladosMode != SpeechManager.gladosMode
+                TTSManager.gladosMode != TTSManager.gladosMode
+            })
+    }
 }

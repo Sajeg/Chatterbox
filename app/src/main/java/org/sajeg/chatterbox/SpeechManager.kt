@@ -7,6 +7,8 @@ import android.speech.SpeechRecognizer
 
 object SpeechManager {
     private lateinit var stt: SpeechRecognizer
+    var gladosMode = true
+
     fun initialize(context: Context) {
         stt = if (SpeechRecognizer.isOnDeviceRecognitionAvailable(context)){
             SpeechRecognizer.createOnDeviceSpeechRecognizer(context)
@@ -22,7 +24,11 @@ object SpeechManager {
             RecognizerIntent.EXTRA_LANGUAGE_MODEL,
             RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
         )
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "de-DE")
+        if(gladosMode){
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US")
+        } else {
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "de-DE")
+        }
         stt.setRecognitionListener(listener)
         stt.startListening(intent)
     }

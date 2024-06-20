@@ -4,9 +4,11 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.speech.tts.TextToSpeech
 import android.util.Log
+import java.util.Locale
 
 object TTSManager {
     private lateinit var tts: TextToSpeech
+    var gladosMode = true
 
     fun initialize(context: Context) {
         tts = TextToSpeech(context) { status ->
@@ -19,6 +21,11 @@ object TTSManager {
                     .build()
                 tts.setOnUtteranceProgressListener(TTSProgress())
                 tts.setAudioAttributes(audioAttributes)
+                if (gladosMode) {
+                    tts.setLanguage(Locale.US)
+                } else {
+                    tts.setLanguage(Locale.GERMAN)
+                }
             }
         }
     }
