@@ -26,7 +26,7 @@ object SpeechManager {
         if(Config.gladosMode){
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US")
         } else {
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "de-DE")
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Config.language)
         }
         stt.setRecognitionListener(listener)
         stt.startListening(intent)

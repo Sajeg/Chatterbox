@@ -231,7 +231,9 @@ class MainActivity : ComponentActivity() {
                             onCheckedChange = { gladosMode = it; Config.gladosMode = it },
                             colors = IconButtonDefaults.iconToggleButtonColors(
                                 containerColor = MaterialTheme.colorScheme.errorContainer,
-                                contentColor = MaterialTheme.colorScheme.error
+                                contentColor = MaterialTheme.colorScheme.error,
+                                checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                checkedContentColor = MaterialTheme.colorScheme.primary
                             ),
                             content = {
                                 Icon(
