@@ -8,21 +8,22 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.IconToggleButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -106,7 +107,7 @@ class MainActivity : ComponentActivity() {
         // First row from left to right
         var languageSelectorActivated: Boolean by remember { mutableStateOf(false) }
         var speakerChecked: Boolean by remember { mutableStateOf(false) }
-        var showTextChecked: Boolean by remember { mutableStateOf(false) }
+        var subtitlesActivated: Boolean by remember { mutableStateOf(false) }
         // Second row from left to right
         var button1: Boolean by remember { mutableStateOf(false) }
         var gladosMode: Boolean by remember { mutableStateOf(false) }
@@ -119,7 +120,8 @@ class MainActivity : ComponentActivity() {
             Row(
                 modifier = contentModifier
                     .fillMaxWidth()
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .padding(horizontal = 30.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -131,17 +133,22 @@ class MainActivity : ComponentActivity() {
                 }
                 // Action Buttons
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Row (
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 15.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ){
                         FilledIconToggleButton(
                             modifier = Modifier.size(72.dp),
                             checked = languageSelectorActivated,
-                            onCheckedChange = { languageSelectorActivated != it },
+                            onCheckedChange = { languageSelectorActivated = it
+                                if (it) subtitlesActivated = false },
                             content = {
                                 Icon(
                                     modifier = Modifier.size(48.dp),
@@ -153,7 +160,7 @@ class MainActivity : ComponentActivity() {
                         FilledIconToggleButton(
                             modifier = Modifier.size(72.dp),
                             checked = speakerChecked,
-                            onCheckedChange = { speakerChecked != it },
+                            onCheckedChange = { speakerChecked = it; Config.speaker = it },
                             content = {
                                 Icon(
                                     modifier = Modifier.size(48.dp),
@@ -164,8 +171,9 @@ class MainActivity : ComponentActivity() {
                         )
                         FilledIconToggleButton(
                             modifier = Modifier.size(72.dp),
-                            checked = showTextChecked,
-                            onCheckedChange = { showTextChecked != it },
+                            checked = subtitlesActivated,
+                            onCheckedChange = { subtitlesActivated = it; Config.subtitles = it
+                                if (it) languageSelectorActivated = false},
                             content = {
                                 Icon(
                                     modifier = Modifier.size(48.dp),
@@ -175,14 +183,40 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     }
+                    AnimatedVisibility(languageSelectorActivated) {
+                        Card (
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(150.dp)
+                        ){
+
+                        }
+                    }
+                    AnimatedVisibility(subtitlesActivated) {
+                        Card (
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(150.dp)
+                        ){
+                            FlowColumn {
+                                for (item in LLMManager.history) {
+                                    Card {
+                                        Text(text = item)
+                                    }
+                                }
+                            }
+                        }
+                    }
                     Row (
-                        modifier = Modifier.padding(top=30.dp).fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                        modifier = Modifier
+                            .padding(top = 15.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ){
                         FilledIconToggleButton(
                             modifier = Modifier.size(72.dp),
                             checked = button1,
-                            onCheckedChange = { button1 != it },
+                            onCheckedChange = { button1 = it; Config.button1 = it },
                             content = {
                                 Icon(
                                     modifier = Modifier.size(48.dp),
@@ -194,10 +228,7 @@ class MainActivity : ComponentActivity() {
                         FilledIconToggleButton(
                             modifier = Modifier.size(72.dp),
                             checked = gladosMode,
-                            onCheckedChange = {
-                                gladosMode = it
-                                SpeechManager.gladosMode = it
-                                TTSManager.gladosMode = it },
+                            onCheckedChange = { gladosMode = it; Config.gladosMode = it },
                             colors = IconButtonDefaults.iconToggleButtonColors(
                                 containerColor = MaterialTheme.colorScheme.errorContainer,
                                 contentColor = MaterialTheme.colorScheme.error
@@ -213,7 +244,7 @@ class MainActivity : ComponentActivity() {
                         FilledIconToggleButton(
                             modifier = Modifier.size(72.dp),
                             checked = button2,
-                            onCheckedChange = { button2 != it },
+                            onCheckedChange = { button2 = it; Config.button2 = it },
                             content = {
                                 Icon(
                                     modifier = Modifier.size(48.dp),

@@ -11,7 +11,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 object LLMManager {
-    private var gladosMode = true
+    val history = mutableListOf("String 1", "String 2")
+
     private val normalInstructions = TextPart(
         "You are a helpful AI assistant that jokes sometimes and the User calls you over phone if he needs help. " +
                 "Write like you would speak. Therefore ALWAYS return plain text without any markdown-styling, lists or smileys. " +
@@ -25,7 +26,7 @@ object LLMManager {
         apiKey = BuildConfig.geminiApiKey,
         systemInstruction = Content(
             parts = listOf(
-                if (gladosMode) gladosInstrcutions else normalInstructions
+                if (Config.gladosMode) gladosInstrcutions else normalInstructions
             )
         ),
         safetySettings = listOf(
@@ -35,7 +36,7 @@ object LLMManager {
         )
     )
 
-    private var chat = if (gladosMode) generativeModel.startChat(listOf<Content>(
+    private var chat = if (Config.gladosMode) generativeModel.startChat(listOf<Content>(
         Content(
             role = "user",
             parts = listOf(TextPart("How do I make a cup of tea?"))
@@ -80,14 +81,7 @@ object LLMManager {
         }
     }
 
-    fun toggleGlados(): Boolean{
-        if(gladosMode){
-            gladosMode = false
-            chat = generativeModel.startChat()
-        } else {
-            gladosMode = true
-            chat = generativeModel.startChat()
-        }
-        return gladosMode
+    fun toggleGlados(){
+       chat = generativeModel.startChat()
     }
 }
