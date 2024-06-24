@@ -8,15 +8,24 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconToggleButtonColors
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import org.sajeg.chatterbox.ui.theme.ChatterboxTheme
 
 
@@ -42,9 +52,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ChatterboxTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    val modifier = Modifier.padding(innerPadding)
-                    MainComposable(modifier)
+                Surface (Modifier.fillMaxSize()){
+                    MainComposable()
                 }
             }
             TTSManager.initialize(this)
@@ -90,8 +99,9 @@ class MainActivity : ComponentActivity() {
         proximitySensor.stopListing()
     }
 
+    @OptIn(ExperimentalLayoutApi::class)
     @Composable
-    fun MainComposable(modifier: Modifier){
+    fun MainComposable(){
         // The state of the different Buttons on Screen
         // First row from left to right
         var languageSelectorActivated: Boolean by remember { mutableStateOf(false) }
@@ -102,43 +112,132 @@ class MainActivity : ComponentActivity() {
         var gladosMode: Boolean by remember { mutableStateOf(false) }
         var button2: Boolean by remember { mutableStateOf(false) }
 
-        Row {
-            // Profile Picture
-            Column (
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-
-            }
-            // Action Buttons
-            Column (
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                Row {
-                    FilledIconToggleButton(
-                        checked = languageSelectorActivated, 
-                        onCheckedChange = { languageSelectorActivated != it },
-                        content = {
-                            Icon(painter = painterResource(id = R.drawable.translate),
-                                contentDescription = stringResource(R.string.desc_lang)) }
-                    )
-                }
-                Row {
+        Scaffold { innerPadding ->
+            val contentModifier = Modifier
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+            Row(
+                modifier = contentModifier
+                    .fillMaxWidth()
+                    .fillMaxSize(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Profile Picture
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
 
                 }
+                // Action Buttons
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Row (
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ){
+                        FilledIconToggleButton(
+                            modifier = Modifier.size(72.dp),
+                            checked = languageSelectorActivated,
+                            onCheckedChange = { languageSelectorActivated != it },
+                            content = {
+                                Icon(
+                                    modifier = Modifier.size(48.dp),
+                                    painter = painterResource(id = R.drawable.translate),
+                                    contentDescription = stringResource(R.string.desc_lang)
+                                )
+                            }
+                        )
+                        FilledIconToggleButton(
+                            modifier = Modifier.size(72.dp),
+                            checked = speakerChecked,
+                            onCheckedChange = { speakerChecked != it },
+                            content = {
+                                Icon(
+                                    modifier = Modifier.size(48.dp),
+                                    painter = painterResource(id = R.drawable.speaker),
+                                    contentDescription = stringResource(R.string.dec_vol)
+                                )
+                            }
+                        )
+                        FilledIconToggleButton(
+                            modifier = Modifier.size(72.dp),
+                            checked = showTextChecked,
+                            onCheckedChange = { showTextChecked != it },
+                            content = {
+                                Icon(
+                                    modifier = Modifier.size(48.dp),
+                                    painter = painterResource(id = R.drawable.subtitles),
+                                    contentDescription = stringResource(R.string.desc_subtitles)
+                                )
+                            }
+                        )
+                    }
+                    Row (
+                        modifier = Modifier.padding(top=30.dp).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ){
+                        FilledIconToggleButton(
+                            modifier = Modifier.size(72.dp),
+                            checked = button1,
+                            onCheckedChange = { button1 != it },
+                            content = {
+                                Icon(
+                                    modifier = Modifier.size(48.dp),
+                                    painter = painterResource(id = R.drawable.translate),
+                                    contentDescription = "temp desc"
+                                )
+                            }
+                        )
+                        FilledIconToggleButton(
+                            modifier = Modifier.size(72.dp),
+                            checked = gladosMode,
+                            onCheckedChange = {
+                                gladosMode = it
+                                SpeechManager.gladosMode = it
+                                TTSManager.gladosMode = it },
+                            colors = IconButtonDefaults.iconToggleButtonColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                contentColor = MaterialTheme.colorScheme.error
+                            ),
+                            content = {
+                                Icon(
+                                    modifier = Modifier.size(48.dp),
+                                    painter = painterResource(id = R.drawable.warning),
+                                    contentDescription = stringResource(R.string.desc_glados)
+                                )
+                            }
+                        )
+                        FilledIconToggleButton(
+                            modifier = Modifier.size(72.dp),
+                            checked = button2,
+                            onCheckedChange = { button2 != it },
+                            content = {
+                                Icon(
+                                    modifier = Modifier.size(48.dp),
+                                    painter = painterResource(id = R.drawable.translate),
+                                    contentDescription = "temp desc"
+                                )
+                            }
+                        )
+                    }
+                }
+                // Call button
+//            Column (
+//                horizontalAlignment = Alignment.CenterHorizontally
+//            ){
+//
+//            }
+//            Button(modifier = modifier,
+//                content = { Text(text = gladosMode.toString()) },
+//                onClick = {
+//                    gladosMode = LLMManager.toggleGlados()
+//                    SpeechManager.gladosMode != SpeechManager.gladosMode
+//                    TTSManager.gladosMode != TTSManager.gladosMode
+//                })
             }
-            // Call button
-            Column (
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                
-            }
-            Button(modifier = modifier,
-                content = { Text(text = gladosMode.toString()) },
-                onClick = {
-                    gladosMode = LLMManager.toggleGlados()
-                    SpeechManager.gladosMode != SpeechManager.gladosMode
-                    TTSManager.gladosMode != TTSManager.gladosMode
-                })
         }
     }
 }

@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Chatterbox</string>
     <string name="desc_lang">Select the language of your conversation</string>
+    <string name="dec_vol">Toggle the volume</string>
+    <string name="desc_subtitles">Show subtitles</string>
+    <string name="desc_glados">Do not press</string>
 </resources>
