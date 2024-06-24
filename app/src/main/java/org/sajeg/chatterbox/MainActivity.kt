@@ -238,9 +238,9 @@ class MainActivity : ComponentActivity() {
                                 .fillMaxWidth()
                                 .height(160.dp)
                         ) {
-                            for (item in LLMManager.history) {
+                            for (item in LLMManager.chat.history) {
                                 Card {
-                                    Text(text = item)
+                                    Text(text = item.parts.joinToString())
                                 }
                             }
                         }

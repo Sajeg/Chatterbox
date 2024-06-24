@@ -1,5 +1,6 @@
 package org.sajeg.chatterbox
 
+import android.util.Log
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.BlockThreshold
 import com.google.ai.client.generativeai.type.Content
@@ -11,7 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 object LLMManager {
-    val history = mutableListOf<String>("Here a transcript from your conversation will be displayed")
+    private val history = mutableListOf<String>("Here a transcript from your conversation will be displayed")
 
     private val normalInstructions = TextPart(
         "You are a helpful AI assistant that jokes sometimes and the User calls you over phone if he needs help. " +
@@ -42,7 +43,7 @@ object LLMManager {
         )
     )
 
-    private var chat = if (Config.gladosMode) generativeModel.startChat(
+    var chat = if (Config.gladosMode) generativeModel.startChat(
         listOf<Content>(
             Content(
                 role = "user",
@@ -138,5 +139,6 @@ object LLMManager {
                 )
             )
         ) else generativeModel.startChat()
+        Log.d("ChatHistory", chat.history.toString())
     }
 }
