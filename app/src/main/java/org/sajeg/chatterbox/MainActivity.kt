@@ -205,7 +205,9 @@ class MainActivity : ComponentActivity() {
                                     leadingContent = {
                                         RadioButton(
                                             selected = language == "en-US",
-                                            onClick = { Config.language = "en-US"; language = "en-US" })
+                                            onClick = {
+                                                Config.language = "en-US"; language = "en-US"
+                                            })
                                     },
                                     headlineContent = { Text(text = stringResource(R.string.english)) },
                                     colors = ListItemDefaults.colors(
@@ -218,7 +220,9 @@ class MainActivity : ComponentActivity() {
                                     leadingContent = {
                                         RadioButton(
                                             selected = language == "de-DE",
-                                            onClick = { Config.language = "de-DE"; language = "de-DE" })
+                                            onClick = {
+                                                Config.language = "de-DE"; language = "de-DE"
+                                            })
                                     },
                                     headlineContent = { Text(text = stringResource(R.string.german)) },
                                     colors = ListItemDefaults.colors(
@@ -229,16 +233,14 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     AnimatedVisibility(subtitlesActivated) {
-                        Card(
+                        FlowColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(160.dp)
                         ) {
-                            FlowColumn {
-                                for (item in LLMManager.history) {
-                                    Card {
-                                        Text(text = item)
-                                    }
+                            for (item in LLMManager.history) {
+                                Card {
+                                    Text(text = item)
                                 }
                             }
                         }
