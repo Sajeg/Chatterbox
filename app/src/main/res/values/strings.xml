@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Chatterbox</string>
+    <string name="desc_lang">Select the language of your conversation</string>
 </resources>

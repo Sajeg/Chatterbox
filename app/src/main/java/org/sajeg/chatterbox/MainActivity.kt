@@ -8,9 +8,14 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilledIconToggleButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,7 +23,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import org.sajeg.chatterbox.ui.theme.ChatterboxTheme
 
 
@@ -84,16 +92,53 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun MainComposable(modifier: Modifier){
-        var gladosMode: Boolean by remember {
-            mutableStateOf(false)
-        }
+        // The state of the different Buttons on Screen
+        // First row from left to right
+        var languageSelectorActivated: Boolean by remember { mutableStateOf(false) }
+        var speakerChecked: Boolean by remember { mutableStateOf(false) }
+        var showTextChecked: Boolean by remember { mutableStateOf(false) }
+        // Second row from left to right
+        var button1: Boolean by remember { mutableStateOf(false) }
+        var gladosMode: Boolean by remember { mutableStateOf(false) }
+        var button2: Boolean by remember { mutableStateOf(false) }
 
-        Button(modifier = modifier,
-            content = { Text(text = gladosMode.toString()) },
-            onClick = {
-                gladosMode = LLMManager.toggleGlados()
-                SpeechManager.gladosMode != SpeechManager.gladosMode
-                TTSManager.gladosMode != TTSManager.gladosMode
-            })
+        Row {
+            // Profile Picture
+            Column (
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+
+            }
+            // Action Buttons
+            Column (
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                Row {
+                    FilledIconToggleButton(
+                        checked = languageSelectorActivated, 
+                        onCheckedChange = { languageSelectorActivated != it },
+                        content = {
+                            Icon(painter = painterResource(id = R.drawable.translate),
+                                contentDescription = stringResource(R.string.desc_lang)) }
+                    )
+                }
+                Row {
+
+                }
+            }
+            // Call button
+            Column (
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                
+            }
+            Button(modifier = modifier,
+                content = { Text(text = gladosMode.toString()) },
+                onClick = {
+                    gladosMode = LLMManager.toggleGlados()
+                    SpeechManager.gladosMode != SpeechManager.gladosMode
+                    TTSManager.gladosMode != TTSManager.gladosMode
+                })
+        }
     }
 }
