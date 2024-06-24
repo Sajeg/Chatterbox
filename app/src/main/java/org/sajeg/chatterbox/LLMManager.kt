@@ -11,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 object LLMManager {
-    val history = mutableListOf("String 1", "String 2")
+    val history = mutableListOf<String>("Here a transcript from your conversation will be displayed")
 
     private val normalInstructions = TextPart(
         "You are a helpful AI assistant that jokes sometimes and the User calls you over phone if he needs help. " +
@@ -68,6 +68,7 @@ object LLMManager {
 
     fun addChatMessage(msg: String) {
         var tmpAnswer = ""
+        val i = history.size - 1
 
         CoroutineScope(Dispatchers.IO).launch {
             chat.sendMessageStream(msg).collect { chunk ->
@@ -80,6 +81,7 @@ object LLMManager {
                 } else {
                     tmpAnswer += chunk.text
                 }
+                history[i] = history[i] + chunk.text!!
             }
         }
     }
