@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -20,11 +21,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -35,11 +41,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.sajeg.chatterbox.ui.theme.ChatterboxTheme
-
 
 
 class MainActivity : ComponentActivity() {
@@ -53,7 +60,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ChatterboxTheme {
-                Surface (Modifier.fillMaxSize()){
+                Surface(Modifier.fillMaxSize()) {
                     MainComposable()
                 }
             }
@@ -102,7 +109,7 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalLayoutApi::class)
     @Composable
-    fun MainComposable(){
+    fun MainComposable() {
         // The state of the different Buttons on Screen
         // First row from left to right
         var languageSelectorActivated: Boolean by remember { mutableStateOf(false) }
@@ -112,6 +119,8 @@ class MainActivity : ComponentActivity() {
         var button1: Boolean by remember { mutableStateOf(false) }
         var gladosMode: Boolean by remember { mutableStateOf(false) }
         var button2: Boolean by remember { mutableStateOf(false) }
+        // Other important variables
+        var language: String by remember { mutableStateOf(Config.language) }
 
         Scaffold { innerPadding ->
             val contentModifier = Modifier
@@ -138,17 +147,19 @@ class MainActivity : ComponentActivity() {
                         .padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Row (
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 15.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
-                    ){
+                    ) {
                         FilledIconToggleButton(
                             modifier = Modifier.size(72.dp),
                             checked = languageSelectorActivated,
-                            onCheckedChange = { languageSelectorActivated = it
-                                if (it) subtitlesActivated = false },
+                            onCheckedChange = {
+                                languageSelectorActivated = it
+                                if (it) subtitlesActivated = false
+                            },
                             content = {
                                 Icon(
                                     modifier = Modifier.size(48.dp),
@@ -172,8 +183,10 @@ class MainActivity : ComponentActivity() {
                         FilledIconToggleButton(
                             modifier = Modifier.size(72.dp),
                             checked = subtitlesActivated,
-                            onCheckedChange = { subtitlesActivated = it; Config.subtitles = it
-                                if (it) languageSelectorActivated = false},
+                            onCheckedChange = {
+                                subtitlesActivated = it; Config.subtitles = it
+                                if (it) languageSelectorActivated = false
+                            },
                             content = {
                                 Icon(
                                     modifier = Modifier.size(48.dp),
@@ -184,20 +197,43 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     AnimatedVisibility(languageSelectorActivated) {
-                        Card (
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(150.dp)
-                        ){
-
+                        LazyColumn(
+                            modifier = Modifier.height(160.dp)
+                        ) {
+                            item {
+                                ListItem(
+                                    leadingContent = {
+                                        RadioButton(
+                                            selected = language == "en-US",
+                                            onClick = { Config.language = "en-US"; language = "en-US" })
+                                    },
+                                    headlineContent = { Text(text = stringResource(R.string.english)) },
+                                    colors = ListItemDefaults.colors(
+                                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                                    )
+                                )
+                            }
+                            item {
+                                ListItem(
+                                    leadingContent = {
+                                        RadioButton(
+                                            selected = language == "de-DE",
+                                            onClick = { Config.language = "de-DE"; language = "de-DE" })
+                                    },
+                                    headlineContent = { Text(text = stringResource(R.string.german)) },
+                                    colors = ListItemDefaults.colors(
+                                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                                    )
+                                )
+                            }
                         }
                     }
                     AnimatedVisibility(subtitlesActivated) {
-                        Card (
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(150.dp)
-                        ){
+                                .height(160.dp)
+                        ) {
                             FlowColumn {
                                 for (item in LLMManager.history) {
                                     Card {
@@ -207,12 +243,12 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-                    Row (
+                    Row(
                         modifier = Modifier
                             .padding(top = 15.dp)
                             .fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
-                    ){
+                    ) {
                         FilledIconToggleButton(
                             modifier = Modifier.size(72.dp),
                             checked = button1,
@@ -232,8 +268,8 @@ class MainActivity : ComponentActivity() {
                             colors = IconButtonDefaults.iconToggleButtonColors(
                                 containerColor = MaterialTheme.colorScheme.errorContainer,
                                 contentColor = MaterialTheme.colorScheme.error,
-                                checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                                checkedContentColor = MaterialTheme.colorScheme.primary
+                                checkedContainerColor = MaterialTheme.colorScheme.error,
+                                checkedContentColor = MaterialTheme.colorScheme.errorContainer
                             ),
                             content = {
                                 Icon(
