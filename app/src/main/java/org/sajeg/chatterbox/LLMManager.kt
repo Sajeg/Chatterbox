@@ -16,7 +16,7 @@ object LLMManager {
 
     private val normalInstructions = TextPart(
         "You are a helpful AI assistant that jokes sometimes and the User calls you over phone if he needs help. " +
-                "Write like you would speak. Don't use any markdown-styling, lists or emojis. " +
+                "Don't use any markdown-styling, lists or emojis. " +
                 "You don't have access to real-time information, like the time or weather. Don't end the call. " +
                 "The User is always allowed to ask further Questions ans answer them in the language of the Users question."
     )
@@ -139,6 +139,7 @@ object LLMManager {
                 )
             )
         ) else generativeModel.startChat()
-        Log.d("ChatHistory", chat.history.toString())
+
+        Log.d("ModelInit", Config.gladosMode.toString())
     }
 }

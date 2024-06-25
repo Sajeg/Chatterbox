@@ -27,7 +27,7 @@ object TTSManager {
                 }
                 tts.setOnUtteranceProgressListener(TTSProgress())
                 tts.setAudioAttributes(audioAttributes)
-                if (Config.gladosMode) {
+                if (Config.gladosMode || Config.language == "en-US") {
                     tts.setLanguage(Locale.US)
                 } else {
                     tts.setLanguage(Locale.GERMAN)
