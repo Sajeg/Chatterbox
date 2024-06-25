@@ -7,5 +7,6 @@ object Config {
     var button1: Boolean = false
     var gladosMode: Boolean = false
         set(value) { field = value; LLMManager.initialize()}
-    var button2: Boolean = false
+    var microphone: Boolean = false
+        set(value) { field = value; if(value) SpeechManager.startRecognition() }
 }

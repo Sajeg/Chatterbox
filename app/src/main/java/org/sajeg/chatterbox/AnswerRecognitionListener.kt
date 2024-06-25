@@ -30,13 +30,14 @@ class AnswerRecognitionListener : RecognitionListener {
     override fun onError(error: Int) {
         // Called when an error occurs
         Log.e("RecognitionListener", "Error Recognizing Speech. ERROR CODE: $error")
+        Config.microphone = false
     }
 
     override fun onResults(results: Bundle?) {
         // Called when a set of speech recognition results is available
         val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
         if (!matches.isNullOrEmpty()) {
-            LLMManager.addChatMessage(matches.toString())
+            LLMManager.addChatMessage(matches[0].toString())
         }
     }
 

@@ -81,7 +81,7 @@ class MainActivity : ComponentActivity() {
                 Log.d("SensorData", distance.toString())
                 if (distance == 0.0F && !TTSManager.isSpeaking()) {
                     if (!lock.isHeld) lock.acquire(10 * 60 * 1000L /*10 minutes*/)
-                    SpeechManager.startRecognition()
+                    Config.microphone = true
 //                    CoroutineScope(Dispatchers.IO).launch {
 //                        while (distance == 0.0F) {
 //                            if (!TTSManager.isSpeaking()) {
@@ -115,7 +115,7 @@ class MainActivity : ComponentActivity() {
         // Second row from left to right
         var button1: Boolean by remember { mutableStateOf(false) }
         var gladosMode: Boolean by remember { mutableStateOf(Config.gladosMode) }
-        var button2: Boolean by remember { mutableStateOf(Config.button2) }
+        var microphoneOn: Boolean by remember { mutableStateOf(Config.microphone) }
         // Other important variables
         var language: String by remember { mutableStateOf(Config.language) }
 
@@ -305,12 +305,12 @@ class MainActivity : ComponentActivity() {
                         )
                         FilledIconToggleButton(
                             modifier = Modifier.size(72.dp),
-                            checked = button2,
-                            onCheckedChange = { button2 = it; Config.button2 = it },
+                            checked = microphoneOn,
+                            onCheckedChange = { microphoneOn = it; Config.microphone = it },
                             content = {
                                 Icon(
                                     modifier = Modifier.size(48.dp),
-                                    painter = painterResource(id = R.drawable.translate),
+                                    painter = painterResource(id = R.drawable.microphone),
                                     contentDescription = "temp desc"
                                 )
                             }
