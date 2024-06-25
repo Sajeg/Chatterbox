@@ -2,8 +2,10 @@ package org.sajeg.chatterbox
 
 import android.content.Context
 import android.hardware.Sensor
+import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
+import android.speech.SpeechRecognizer
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,6 +25,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -104,7 +107,7 @@ class MainActivity : ComponentActivity() {
         var speakerChecked: Boolean by remember { mutableStateOf(Config.speaker) }
         var subtitlesActivated: Boolean by remember { mutableStateOf(Config.subtitles) }
         // Second row from left to right
-        var button1: Boolean by remember { mutableStateOf(false) }
+        var info: Boolean by remember { mutableStateOf(false) }
         var gladosMode: Boolean by remember { mutableStateOf(Config.gladosMode) }
         var microphoneOn: Boolean by remember { mutableStateOf(Config.microphone) }
         // Other important variables
@@ -118,12 +121,13 @@ class MainActivity : ComponentActivity() {
                 .padding(top = 30.dp)
                 .padding(horizontal = 30.dp)
                 .consumeWindowInsets(innerPadding)
-
-            Column (
+            Column(
                 modifier = contentModifier
-            ){
+            ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     // Profile Picture
@@ -153,54 +157,59 @@ class MainActivity : ComponentActivity() {
                             .padding(20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 15.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            FilledIconToggleButton(
-                                modifier = Modifier.size(72.dp),
-                                checked = languageSelectorActivated,
-                                onCheckedChange = {
-                                    languageSelectorActivated = it
-                                    if (it) subtitlesActivated = false
-                                },
-                                content = {
-                                    Icon(
-                                        modifier = Modifier.size(48.dp),
-                                        painter = painterResource(id = R.drawable.translate),
-                                        contentDescription = stringResource(R.string.desc_lang)
-                                    )
-                                }
-                            )
-                            FilledIconToggleButton(
-                                modifier = Modifier.size(72.dp),
-                                checked = speakerChecked,
-                                onCheckedChange = { speakerChecked = it; Config.speaker = it },
-                                content = {
-                                    Icon(
-                                        modifier = Modifier.size(48.dp),
-                                        painter = painterResource(id = R.drawable.speaker),
-                                        contentDescription = stringResource(R.string.dec_vol)
-                                    )
-                                }
-                            )
-                            FilledIconToggleButton(
-                                modifier = Modifier.size(72.dp),
-                                checked = subtitlesActivated,
-                                onCheckedChange = {
-                                    subtitlesActivated = it; Config.subtitles = it
-                                    if (it) languageSelectorActivated = false
-                                },
-                                content = {
-                                    Icon(
-                                        modifier = Modifier.size(48.dp),
-                                        painter = painterResource(id = R.drawable.subtitles),
-                                        contentDescription = stringResource(R.string.desc_subtitles)
-                                    )
-                                }
-                            )
+                        AnimatedVisibility(!callOnGoing) {
+                            Text(text = "To Start a call hold the phone to your ear or press the button and start speaking")
+                        }
+                        AnimatedVisibility(callOnGoing) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 15.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                FilledIconToggleButton(
+                                    modifier = Modifier.size(72.dp),
+                                    checked = languageSelectorActivated,
+                                    onCheckedChange = {
+                                        languageSelectorActivated = it
+                                        if (it) subtitlesActivated = false; info = false
+                                    },
+                                    content = {
+                                        Icon(
+                                            modifier = Modifier.size(48.dp),
+                                            painter = painterResource(id = R.drawable.translate),
+                                            contentDescription = stringResource(R.string.desc_lang)
+                                        )
+                                    }
+                                )
+                                FilledIconToggleButton(
+                                    modifier = Modifier.size(72.dp),
+                                    checked = speakerChecked,
+                                    onCheckedChange = { speakerChecked = it; Config.speaker = it },
+                                    content = {
+                                        Icon(
+                                            modifier = Modifier.size(48.dp),
+                                            painter = painterResource(id = R.drawable.speaker),
+                                            contentDescription = stringResource(R.string.dec_vol)
+                                        )
+                                    }
+                                )
+                                FilledIconToggleButton(
+                                    modifier = Modifier.size(72.dp),
+                                    checked = subtitlesActivated,
+                                    onCheckedChange = {
+                                        subtitlesActivated = it; Config.subtitles = it
+                                        if (it) languageSelectorActivated = false; info = false
+                                    },
+                                    content = {
+                                        Icon(
+                                            modifier = Modifier.size(48.dp),
+                                            painter = painterResource(id = R.drawable.subtitles),
+                                            contentDescription = stringResource(R.string.desc_subtitles)
+                                        )
+                                    }
+                                )
+                            }
                         }
                         AnimatedVisibility(languageSelectorActivated) {
                             LazyColumn(
@@ -212,7 +221,8 @@ class MainActivity : ComponentActivity() {
                                             RadioButton(
                                                 selected = language == "en-US",
                                                 onClick = {
-                                                    Config.language = "en-US"; language = "en-US"
+                                                    Config.language = "en-US"; language =
+                                                    "en-US"
                                                 })
                                         },
                                         headlineContent = { Text(text = stringResource(R.string.english)) },
@@ -227,7 +237,8 @@ class MainActivity : ComponentActivity() {
                                             RadioButton(
                                                 selected = language == "de-DE",
                                                 onClick = {
-                                                    Config.language = "de-DE"; language = "de-DE"
+                                                    Config.language = "de-DE"; language =
+                                                    "de-DE"
                                                 })
                                         },
                                         headlineContent = { Text(text = stringResource(R.string.german)) },
@@ -246,7 +257,8 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 item {
                                     for (item in LLMManager.chat.history) {
-                                        var text = item.parts[0].asTextOrNull().toString().trim()
+                                        var text =
+                                            item.parts[0].asTextOrNull().toString().trim()
                                         var cardColor = CardDefaults.cardColors()
 
                                         if (item.role == "user") {
@@ -276,54 +288,70 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
-                        Row(
-                            modifier = Modifier
-                                .padding(top = 15.dp)
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            FilledIconToggleButton(
-                                modifier = Modifier.size(72.dp),
-                                checked = button1,
-                                onCheckedChange = { button1 = it; Config.button1 = it },
-                                content = {
-                                    Icon(
-                                        modifier = Modifier.size(48.dp),
-                                        painter = painterResource(id = R.drawable.translate),
-                                        contentDescription = "temp desc"
-                                    )
-                                }
+                        AnimatedVisibility(info) {
+                            Text(
+                                text = "Phone: ${Build.MODEL}" +
+                                        "\n OnDeviceRecognition: ${
+                                            SpeechRecognizer
+                                                .isOnDeviceRecognitionAvailable(this@MainActivity)
+                                        }" +
+                                        "\n SDK: ${Build.VERSION.SDK_INT}"
                             )
-                            FilledIconToggleButton(
-                                modifier = Modifier.size(72.dp),
-                                checked = gladosMode,
-                                onCheckedChange = { gladosMode = it; Config.gladosMode = it; },
-                                colors = IconButtonDefaults.iconToggleButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                                    contentColor = MaterialTheme.colorScheme.error,
-                                    checkedContainerColor = MaterialTheme.colorScheme.error,
-                                    checkedContentColor = MaterialTheme.colorScheme.errorContainer
-                                ),
-                                content = {
-                                    Icon(
-                                        modifier = Modifier.size(48.dp),
-                                        painter = painterResource(id = R.drawable.warning),
-                                        contentDescription = stringResource(R.string.desc_glados)
-                                    )
-                                }
-                            )
-                            FilledIconToggleButton(
-                                modifier = Modifier.size(72.dp),
-                                checked = microphoneOn,
-                                onCheckedChange = { microphoneOn = it; Config.microphone = it },
-                                content = {
-                                    Icon(
-                                        modifier = Modifier.size(48.dp),
-                                        painter = painterResource(id = R.drawable.microphone),
-                                        contentDescription = "temp desc"
-                                    )
-                                }
-                            )
+                        }
+                        AnimatedVisibility(callOnGoing) {
+
+                            Row(
+                                modifier = Modifier
+                                    .padding(top = 15.dp)
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                FilledIconToggleButton(
+                                    modifier = Modifier.size(72.dp),
+                                    checked = info,
+                                    onCheckedChange = {
+                                        info = it; Config.button1 = it
+                                        if (it) subtitlesActivated =
+                                            false; languageSelectorActivated = false
+                                    },
+                                    content = {
+                                        Icon(
+                                            modifier = Modifier.size(48.dp),
+                                            painter = painterResource(id = R.drawable.info),
+                                            contentDescription = "temp desc"
+                                        )
+                                    }
+                                )
+                                FilledIconToggleButton(
+                                    modifier = Modifier.size(72.dp),
+                                    checked = gladosMode,
+                                    onCheckedChange = { gladosMode = it; Config.gladosMode = it; },
+                                    colors = IconButtonDefaults.iconToggleButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                                        contentColor = MaterialTheme.colorScheme.error,
+                                        checkedContainerColor = MaterialTheme.colorScheme.error,
+                                        checkedContentColor = MaterialTheme.colorScheme.errorContainer
+                                    ),
+                                    content = {
+                                        Icon(
+                                            modifier = Modifier.size(48.dp),
+                                            painter = painterResource(id = R.drawable.warning),
+                                            contentDescription = stringResource(R.string.desc_glados)
+                                        )
+                                    }
+                                )
+                                FilledIconButton(
+                                    modifier = Modifier.size(72.dp),
+                                    onClick = { microphoneOn = true; Config.microphone = true },
+                                    content = {
+                                        Icon(
+                                            modifier = Modifier.size(48.dp),
+                                            painter = painterResource(id = R.drawable.microphone),
+                                            contentDescription = "temp desc"
+                                        )
+                                    }
+                                )
+                            }
                         }
                         Row(
                             modifier = Modifier
@@ -334,16 +362,24 @@ class MainActivity : ComponentActivity() {
                             FilledIconToggleButton(
                                 modifier = Modifier.size(72.dp),
                                 checked = callOnGoing,
-                                onCheckedChange = { callOnGoing = it; Config.call = it },
+                                onCheckedChange = { callOnGoing = it; Config.call = it; Config.microphone = it; microphoneOn = it },
                                 content = {
-                                    Icon(
-                                        modifier = Modifier.size(48.dp),
-                                        painter = painterResource(id = R.drawable.call),
-                                        contentDescription = stringResource(R.string.call_desc)
-                                    )
+                                    if (callOnGoing){
+                                        Icon(
+                                            modifier = Modifier.size(48.dp),
+                                            painter = painterResource(id = R.drawable.call_end),
+                                            contentDescription = stringResource(R.string.call_end_desc)
+                                        )
+                                    } else {
+                                        Icon(
+                                            modifier = Modifier.size(48.dp),
+                                            painter = painterResource(id = R.drawable.call),
+                                            contentDescription = stringResource(R.string.call_desc)
+                                        )
+                                    }
                                 },
                                 colors = IconButtonDefaults.iconToggleButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer, // WHAT IS THE SOLUTION
                                     contentColor = MaterialTheme.colorScheme.primary,
                                     checkedContainerColor = MaterialTheme.colorScheme.error,
                                     checkedContentColor = MaterialTheme.colorScheme.errorContainer

@@ -7,6 +7,7 @@
     <string name="desc_glados">Nicht drücken</string>
     <string name="german">Deutsch</string>
     <string name="english">Englisch</string>
-    <string name="call_desc">Starte oder beende den Anruf</string>
+    <string name="call_desc">Starte den Anruf</string>
     <string name="prf_desc">Profil Bild</string>
+    <string name="call_end_desc">Beende den Anruf</string>
 </resources>
