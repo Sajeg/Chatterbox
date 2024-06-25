@@ -7,4 +7,5 @@
     <string name="german">German</string>
     <string name="english">English</string>
     <string name="call_desc">Start or end the Call</string>
+    <string name="prf_desc">Profile Picture</string>
 </resources>

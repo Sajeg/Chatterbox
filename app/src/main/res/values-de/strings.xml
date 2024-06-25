@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Chatterbox</string>
+    <string name="desc_lang">Wähle die Sprach für deine Konversation aus</string>
+    <string name="dec_vol">Die Lautstärke umschalten</string>
+    <string name="desc_subtitles">Untertitel einblenden</string>
+    <string name="desc_glados">Nicht drücken</string>
+    <string name="german">Deutsch</string>
+    <string name="english">Englisch</string>
+    <string name="call_desc">Starte oder beende den Anruf</string>
+    <string name="prf_desc">Profil Bild</string>
 </resources>

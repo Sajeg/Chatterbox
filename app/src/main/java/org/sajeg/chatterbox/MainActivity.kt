@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledIconToggleButton
@@ -114,229 +115,244 @@ class MainActivity : ComponentActivity() {
             val contentModifier = Modifier
                 .fillMaxWidth()
                 .padding(innerPadding)
+                .padding(top = 30.dp)
                 .padding(horizontal = 30.dp)
                 .consumeWindowInsets(innerPadding)
-            Row(
-                modifier = contentModifier.padding(top = 15.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                // Profile Picture
-                Card(
-                    modifier = Modifier.size(180.dp)
-                ) {
 
-                }
-            }
-            Row(
+            Column (
                 modifier = contentModifier
-                    .fillMaxSize(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+            ){
+                Row(
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Row(
+                    // Profile Picture
+                    Card(
+                        modifier = Modifier.size(180.dp),
+                        shape = CircleShape
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .size(180.dp),
+                            painter = painterResource(
+                                id = if (gladosMode) R.drawable.aperture else R.drawable.profile
+                            ),
+                            contentDescription = stringResource(R.string.prf_desc)
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier.weight(2f),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 15.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        FilledIconToggleButton(
-                            modifier = Modifier.size(72.dp),
-                            checked = languageSelectorActivated,
-                            onCheckedChange = {
-                                languageSelectorActivated = it
-                                if (it) subtitlesActivated = false
-                            },
-                            content = {
-                                Icon(
-                                    modifier = Modifier.size(48.dp),
-                                    painter = painterResource(id = R.drawable.translate),
-                                    contentDescription = stringResource(R.string.desc_lang)
-                                )
-                            }
-                        )
-                        FilledIconToggleButton(
-                            modifier = Modifier.size(72.dp),
-                            checked = speakerChecked,
-                            onCheckedChange = { speakerChecked = it; Config.speaker = it },
-                            content = {
-                                Icon(
-                                    modifier = Modifier.size(48.dp),
-                                    painter = painterResource(id = R.drawable.speaker),
-                                    contentDescription = stringResource(R.string.dec_vol)
-                                )
-                            }
-                        )
-                        FilledIconToggleButton(
-                            modifier = Modifier.size(72.dp),
-                            checked = subtitlesActivated,
-                            onCheckedChange = {
-                                subtitlesActivated = it; Config.subtitles = it
-                                if (it) languageSelectorActivated = false
-                            },
-                            content = {
-                                Icon(
-                                    modifier = Modifier.size(48.dp),
-                                    painter = painterResource(id = R.drawable.subtitles),
-                                    contentDescription = stringResource(R.string.desc_subtitles)
-                                )
-                            }
-                        )
-                    }
-                    AnimatedVisibility(languageSelectorActivated) {
-                        LazyColumn(
-                            modifier = Modifier.height(160.dp)
-                        ) {
-                            item {
-                                ListItem(
-                                    leadingContent = {
-                                        RadioButton(
-                                            selected = language == "en-US",
-                                            onClick = {
-                                                Config.language = "en-US"; language = "en-US"
-                                            })
-                                    },
-                                    headlineContent = { Text(text = stringResource(R.string.english)) },
-                                    colors = ListItemDefaults.colors(
-                                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                                    )
-                                )
-                            }
-                            item {
-                                ListItem(
-                                    leadingContent = {
-                                        RadioButton(
-                                            selected = language == "de-DE",
-                                            onClick = {
-                                                Config.language = "de-DE"; language = "de-DE"
-                                            })
-                                    },
-                                    headlineContent = { Text(text = stringResource(R.string.german)) },
-                                    colors = ListItemDefaults.colors(
-                                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                                    )
-                                )
-                            }
-                        }
-                    }
-                    AnimatedVisibility(subtitlesActivated) {
-                        LazyColumn(
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(160.dp)
+                                .padding(bottom = 15.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            item {
-                                for (item in LLMManager.chat.history) {
-                                    var text = item.parts[0].asTextOrNull().toString().trim()
-                                    var cardColor = CardDefaults.cardColors()
-
-                                    if (item.role == "user") {
-                                        text = text
-                                            .replace("[", "")
-                                            .replace("]", "")
-                                        cardColor = CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                            contentColor = MaterialTheme.colorScheme.primary
+                            FilledIconToggleButton(
+                                modifier = Modifier.size(72.dp),
+                                checked = languageSelectorActivated,
+                                onCheckedChange = {
+                                    languageSelectorActivated = it
+                                    if (it) subtitlesActivated = false
+                                },
+                                content = {
+                                    Icon(
+                                        modifier = Modifier.size(48.dp),
+                                        painter = painterResource(id = R.drawable.translate),
+                                        contentDescription = stringResource(R.string.desc_lang)
+                                    )
+                                }
+                            )
+                            FilledIconToggleButton(
+                                modifier = Modifier.size(72.dp),
+                                checked = speakerChecked,
+                                onCheckedChange = { speakerChecked = it; Config.speaker = it },
+                                content = {
+                                    Icon(
+                                        modifier = Modifier.size(48.dp),
+                                        painter = painterResource(id = R.drawable.speaker),
+                                        contentDescription = stringResource(R.string.dec_vol)
+                                    )
+                                }
+                            )
+                            FilledIconToggleButton(
+                                modifier = Modifier.size(72.dp),
+                                checked = subtitlesActivated,
+                                onCheckedChange = {
+                                    subtitlesActivated = it; Config.subtitles = it
+                                    if (it) languageSelectorActivated = false
+                                },
+                                content = {
+                                    Icon(
+                                        modifier = Modifier.size(48.dp),
+                                        painter = painterResource(id = R.drawable.subtitles),
+                                        contentDescription = stringResource(R.string.desc_subtitles)
+                                    )
+                                }
+                            )
+                        }
+                        AnimatedVisibility(languageSelectorActivated) {
+                            LazyColumn(
+                                modifier = Modifier.height(160.dp)
+                            ) {
+                                item {
+                                    ListItem(
+                                        leadingContent = {
+                                            RadioButton(
+                                                selected = language == "en-US",
+                                                onClick = {
+                                                    Config.language = "en-US"; language = "en-US"
+                                                })
+                                        },
+                                        headlineContent = { Text(text = stringResource(R.string.english)) },
+                                        colors = ListItemDefaults.colors(
+                                            containerColor = MaterialTheme.colorScheme.secondaryContainer
                                         )
-                                    }
+                                    )
+                                }
+                                item {
+                                    ListItem(
+                                        leadingContent = {
+                                            RadioButton(
+                                                selected = language == "de-DE",
+                                                onClick = {
+                                                    Config.language = "de-DE"; language = "de-DE"
+                                                })
+                                        },
+                                        headlineContent = { Text(text = stringResource(R.string.german)) },
+                                        colors = ListItemDefaults.colors(
+                                            containerColor = MaterialTheme.colorScheme.secondaryContainer
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                        AnimatedVisibility(subtitlesActivated) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(160.dp)
+                            ) {
+                                item {
+                                    for (item in LLMManager.chat.history) {
+                                        var text = item.parts[0].asTextOrNull().toString().trim()
+                                        var cardColor = CardDefaults.cardColors()
 
-                                    Card(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(5.dp),
-                                        colors = cardColor
-                                    ) {
-                                        Text(
-                                            text = text,
+                                        if (item.role == "user") {
+                                            text = text
+                                                .replace("[", "")
+                                                .replace("]", "")
+                                            cardColor = CardDefaults.cardColors(
+                                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                                contentColor = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
+
+                                        Card(
                                             modifier = Modifier
-                                                .padding(5.dp)
                                                 .fillMaxWidth()
-                                        )
+                                                .padding(5.dp),
+                                            colors = cardColor
+                                        ) {
+                                            Text(
+                                                text = text,
+                                                modifier = Modifier
+                                                    .padding(5.dp)
+                                                    .fillMaxWidth()
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
+                        Row(
+                            modifier = Modifier
+                                .padding(top = 15.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            FilledIconToggleButton(
+                                modifier = Modifier.size(72.dp),
+                                checked = button1,
+                                onCheckedChange = { button1 = it; Config.button1 = it },
+                                content = {
+                                    Icon(
+                                        modifier = Modifier.size(48.dp),
+                                        painter = painterResource(id = R.drawable.translate),
+                                        contentDescription = "temp desc"
+                                    )
+                                }
+                            )
+                            FilledIconToggleButton(
+                                modifier = Modifier.size(72.dp),
+                                checked = gladosMode,
+                                onCheckedChange = { gladosMode = it; Config.gladosMode = it; },
+                                colors = IconButtonDefaults.iconToggleButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                                    contentColor = MaterialTheme.colorScheme.error,
+                                    checkedContainerColor = MaterialTheme.colorScheme.error,
+                                    checkedContentColor = MaterialTheme.colorScheme.errorContainer
+                                ),
+                                content = {
+                                    Icon(
+                                        modifier = Modifier.size(48.dp),
+                                        painter = painterResource(id = R.drawable.warning),
+                                        contentDescription = stringResource(R.string.desc_glados)
+                                    )
+                                }
+                            )
+                            FilledIconToggleButton(
+                                modifier = Modifier.size(72.dp),
+                                checked = microphoneOn,
+                                onCheckedChange = { microphoneOn = it; Config.microphone = it },
+                                content = {
+                                    Icon(
+                                        modifier = Modifier.size(48.dp),
+                                        painter = painterResource(id = R.drawable.microphone),
+                                        contentDescription = "temp desc"
+                                    )
+                                }
+                            )
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(30.dp),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            FilledIconToggleButton(
+                                modifier = Modifier.size(72.dp),
+                                checked = callOnGoing,
+                                onCheckedChange = { callOnGoing = it; Config.call = it },
+                                content = {
+                                    Icon(
+                                        modifier = Modifier.size(48.dp),
+                                        painter = painterResource(id = R.drawable.call),
+                                        contentDescription = stringResource(R.string.call_desc)
+                                    )
+                                },
+                                colors = IconButtonDefaults.iconToggleButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.primary,
+                                    checkedContainerColor = MaterialTheme.colorScheme.error,
+                                    checkedContentColor = MaterialTheme.colorScheme.errorContainer
+                                )
+                            )
+                        }
                     }
-                    Row(
-                        modifier = Modifier
-                            .padding(top = 15.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        FilledIconToggleButton(
-                            modifier = Modifier.size(72.dp),
-                            checked = button1,
-                            onCheckedChange = { button1 = it; Config.button1 = it },
-                            content = {
-                                Icon(
-                                    modifier = Modifier.size(48.dp),
-                                    painter = painterResource(id = R.drawable.translate),
-                                    contentDescription = "temp desc"
-                                )
-                            }
-                        )
-                        FilledIconToggleButton(
-                            modifier = Modifier.size(72.dp),
-                            checked = gladosMode,
-                            onCheckedChange = { gladosMode = it; Config.gladosMode = it; },
-                            colors = IconButtonDefaults.iconToggleButtonColors(
-                                containerColor = MaterialTheme.colorScheme.errorContainer,
-                                contentColor = MaterialTheme.colorScheme.error,
-                                checkedContainerColor = MaterialTheme.colorScheme.error,
-                                checkedContentColor = MaterialTheme.colorScheme.errorContainer
-                            ),
-                            content = {
-                                Icon(
-                                    modifier = Modifier.size(48.dp),
-                                    painter = painterResource(id = R.drawable.warning),
-                                    contentDescription = stringResource(R.string.desc_glados)
-                                )
-                            }
-                        )
-                        FilledIconToggleButton(
-                            modifier = Modifier.size(72.dp),
-                            checked = microphoneOn,
-                            onCheckedChange = { microphoneOn = it; Config.microphone = it },
-                            content = {
-                                Icon(
-                                    modifier = Modifier.size(48.dp),
-                                    painter = painterResource(id = R.drawable.microphone),
-                                    contentDescription = "temp desc"
-                                )
-                            }
-                        )
-                    }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(30.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        FilledIconToggleButton(
-                            modifier = Modifier.size(72.dp),
-                            checked = callOnGoing,
-                            onCheckedChange = { callOnGoing = it; Config.call = it },
-                            content = {
-                                Icon(
-                                    modifier = Modifier.size(48.dp),
-                                    painter = painterResource(id = R.drawable.call),
-                                    contentDescription = stringResource(R.string.call_desc)
-                                )
-                            },
-                            colors = IconButtonDefaults.iconToggleButtonColors(
-                                containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                                contentColor = MaterialTheme.colorScheme.primary,
-                                checkedContainerColor = MaterialTheme.colorScheme.error,
-                                checkedContentColor = MaterialTheme.colorScheme.errorContainer
-                            ))
-                    }
+                    // Call button
                 }
-                // Call button
             }
         }
     }
