@@ -80,20 +80,10 @@ class MainActivity : ComponentActivity() {
                 distance = values[0]
                 Log.d("SensorData", distance.toString())
                 if (distance == 0.0F && !TTSManager.isSpeaking()) {
-                    if (!lock.isHeld) lock.acquire(10 * 60 * 1000L /*10 minutes*/)
+                    if (!lock.isHeld) lock.acquire(10 * 60 * 1000L)
                     Config.microphone = true
-//                    CoroutineScope(Dispatchers.IO).launch {
-//                        while (distance == 0.0F) {
-//                            if (!TTSManager.isSpeaking()) {
-//                                Log.d("SensorData", "Still ear")
-//                                speechRecognition()
-//                            }
-//                            delay(100)
-//                        }
-//                    }
                 } else {
                     if (lock.isHeld) lock.release()
-//                    SpeechManager.stopRecognition()
                 }
             }
         }
@@ -118,26 +108,31 @@ class MainActivity : ComponentActivity() {
         var microphoneOn: Boolean by remember { mutableStateOf(Config.microphone) }
         // Other important variables
         var language: String by remember { mutableStateOf(Config.language) }
+        var callOnGoing: Boolean by remember { mutableStateOf(false) }
 
         Scaffold { innerPadding ->
             val contentModifier = Modifier
+                .fillMaxWidth()
                 .padding(innerPadding)
+                .padding(horizontal = 30.dp)
                 .consumeWindowInsets(innerPadding)
             Row(
-                modifier = contentModifier
-                    .fillMaxWidth()
-                    .fillMaxSize()
-                    .padding(horizontal = 30.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                modifier = contentModifier.padding(top = 15.dp),
+                horizontalArrangement = Arrangement.Center
             ) {
                 // Profile Picture
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Card(
+                    modifier = Modifier.size(180.dp)
                 ) {
 
                 }
-                // Action Buttons
+            }
+            Row(
+                modifier = contentModifier
+                    .fillMaxSize(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -316,9 +311,32 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(30.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        FilledIconToggleButton(
+                            modifier = Modifier.size(72.dp),
+                            checked = callOnGoing,
+                            onCheckedChange = { callOnGoing = it; Config.call = it },
+                            content = {
+                                Icon(
+                                    modifier = Modifier.size(48.dp),
+                                    painter = painterResource(id = R.drawable.call),
+                                    contentDescription = stringResource(R.string.call_desc)
+                                )
+                            },
+                            colors = IconButtonDefaults.iconToggleButtonColors(
+                                containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                contentColor = MaterialTheme.colorScheme.primary,
+                                checkedContainerColor = MaterialTheme.colorScheme.error,
+                                checkedContentColor = MaterialTheme.colorScheme.errorContainer
+                            ))
+                    }
                 }
                 // Call button
-
             }
         }
     }
