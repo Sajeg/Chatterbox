@@ -6,7 +6,7 @@
     <string name="desc_glados">Do not press</string>
     <string name="german">German</string>
     <string name="english">English</string>
-    <string name="call_desc">Start or end the Call</string>
+    <string name="call_desc">Start the Call</string>
     <string name="prf_desc">Profile Picture</string>
     <string name="call_end_desc">End the Call</string>
 </resources>

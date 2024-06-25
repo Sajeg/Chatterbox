@@ -23,8 +23,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
@@ -36,8 +38,10 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,6 +50,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.google.ai.client.generativeai.type.asTextOrNull
 import org.sajeg.chatterbox.ui.theme.ChatterboxTheme
 
@@ -98,7 +104,7 @@ class MainActivity : ComponentActivity() {
         proximitySensor.stopListing()
     }
 
-    @OptIn(ExperimentalLayoutApi::class)
+    @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
     @Composable
     fun MainComposable() {
         // The state of the different Buttons on Screen
@@ -113,6 +119,8 @@ class MainActivity : ComponentActivity() {
         // Other important variables
         var language: String by remember { mutableStateOf(Config.language) }
         var callOnGoing: Boolean by remember { mutableStateOf(false) }
+        var attemptNum: Int by remember { mutableIntStateOf(0) }
+        var showDialog: Boolean by remember { mutableStateOf(false) }
 
         Scaffold { innerPadding ->
             val contentModifier = Modifier
@@ -299,7 +307,6 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         AnimatedVisibility(callOnGoing) {
-
                             Row(
                                 modifier = Modifier
                                     .padding(top = 15.dp)
@@ -325,7 +332,16 @@ class MainActivity : ComponentActivity() {
                                 FilledIconToggleButton(
                                     modifier = Modifier.size(72.dp),
                                     checked = gladosMode,
-                                    onCheckedChange = { gladosMode = it; Config.gladosMode = it; },
+                                    onCheckedChange = {
+                                        when (attemptNum) {
+                                            0, 1, 2, 3 -> {
+                                                showDialog = true
+                                            }
+
+                                            else -> {
+                                                gladosMode = it; Config.gladosMode = it; }
+                                        }
+                                    },
                                     colors = IconButtonDefaults.iconToggleButtonColors(
                                         containerColor = MaterialTheme.colorScheme.errorContainer,
                                         contentColor = MaterialTheme.colorScheme.error,
@@ -353,6 +369,13 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         }
+//                        if (showDialog) {
+//                            AlertDialog(
+//                                onDismissRequest = { attemptNum++; showDialog = false },
+//                                confirmButton = ,
+//                                content = { Text(text = "Do not press that Button") }
+//                            )
+//                        }
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -362,9 +385,12 @@ class MainActivity : ComponentActivity() {
                             FilledIconToggleButton(
                                 modifier = Modifier.size(72.dp),
                                 checked = callOnGoing,
-                                onCheckedChange = { callOnGoing = it; Config.call = it; Config.microphone = it; microphoneOn = it },
+                                onCheckedChange = {
+                                    callOnGoing = it; Config.call = it; Config.microphone =
+                                    it; microphoneOn = it
+                                },
                                 content = {
-                                    if (callOnGoing){
+                                    if (callOnGoing) {
                                         Icon(
                                             modifier = Modifier.size(48.dp),
                                             painter = painterResource(id = R.drawable.call_end),
@@ -387,7 +413,6 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
-                    // Call button
                 }
             }
         }
