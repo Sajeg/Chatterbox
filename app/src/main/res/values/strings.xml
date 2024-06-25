@@ -9,4 +9,10 @@
     <string name="call_desc">Start the Call</string>
     <string name="prf_desc">Profile Picture</string>
     <string name="call_end_desc">End the Call</string>
+    <string name="warn">Warning</string>
+    <string name="warn_txt_0">Do not press the Button</string>
+    <string name="warn_txt_1" >You shouldn\'t press the Button</string>
+    <string name="warn_txt_3" >This is a mistake</string>
+    <string name="warn_txt_2" >It is highly recommend to not press this Button</string>
+    <string name="start_desc">To Start a call hold the phone to your ear or press the button and start speaking</string>
 </resources>

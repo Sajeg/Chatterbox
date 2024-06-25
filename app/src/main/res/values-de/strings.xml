@@ -10,4 +10,10 @@
     <string name="call_desc">Starte den Anruf</string>
     <string name="prf_desc">Profil Bild</string>
     <string name="call_end_desc">Beende den Anruf</string>
+    <string name="warn">Warnung</string>
+    <string name="warn_txt_0">Den Button nicht drücken</string>
+    <string name="warn_txt_1">Du solltest nicht den Button drücken</string>
+    <string name="warn_txt_3">Dies ist ein Fehler</string>
+    <string name="warn_txt_2">Es wird dringstens empholen den Button nicht zu drücken</string>
+    <string name="start_desc">Um einen Anruf zu starten halte das Handy an das Ohr oder drücke auf den Button und fange an zu reden</string>
 </resources>

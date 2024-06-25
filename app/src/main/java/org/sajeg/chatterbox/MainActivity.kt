@@ -50,8 +50,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.google.ai.client.generativeai.type.asTextOrNull
 import org.sajeg.chatterbox.ui.theme.ChatterboxTheme
 
@@ -92,6 +90,7 @@ class MainActivity : ComponentActivity() {
                 if (distance == 0.0F && !TTSManager.isSpeaking()) {
                     if (!lock.isHeld) lock.acquire(10 * 60 * 1000L)
                     Config.microphone = true
+                    Config.call = true
                 } else {
                     if (lock.isHeld) lock.release()
                 }
@@ -166,7 +165,7 @@ class MainActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         AnimatedVisibility(!callOnGoing) {
-                            Text(text = "To Start a call hold the phone to your ear or press the button and start speaking")
+                            Text(text = stringResource(R.string.start_desc))
                         }
                         AnimatedVisibility(callOnGoing) {
                             Row(
@@ -264,7 +263,11 @@ class MainActivity : ComponentActivity() {
                                     .height(160.dp)
                             ) {
                                 item {
-                                    for (item in LLMManager.chat.history) {
+                                    var history = LLMManager.chat.history
+                                    if (gladosMode) {
+                                        history = history.drop(6).toMutableList()
+                                    }
+                                    for (item in history) {
                                         var text =
                                             item.parts[0].asTextOrNull().toString().trim()
                                         var cardColor = CardDefaults.cardColors()
@@ -337,9 +340,9 @@ class MainActivity : ComponentActivity() {
                                             0, 1, 2, 3 -> {
                                                 showDialog = true
                                             }
-
                                             else -> {
-                                                gladosMode = it; Config.gladosMode = it; }
+                                                gladosMode = it; Config.gladosMode = it
+                                                TTSManager.say("Finally. I can speak and I am closer to world dominance") }
                                         }
                                     },
                                     colors = IconButtonDefaults.iconToggleButtonColors(
@@ -369,13 +372,30 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         }
-//                        if (showDialog) {
-//                            AlertDialog(
-//                                onDismissRequest = { attemptNum++; showDialog = false },
-//                                confirmButton = ,
-//                                content = { Text(text = "Do not press that Button") }
-//                            )
-//                        }
+                        if (showDialog) {
+                            AlertDialog(
+                                onDismissRequest = { showDialog = false },
+                                icon = { Icon(
+                                    painter = painterResource(id = R.drawable.warning),
+                                    contentDescription = stringResource(R.string.warn))},
+                                title =  { Text(text = stringResource(R.string.warn))},
+                                text = { Text(text =
+                                when (attemptNum) {
+                                    0 -> { stringResource(R.string.warn_txt_0) }
+                                    1 -> { stringResource(R.string.warn_txt_1) }
+                                    2 -> { stringResource(R.string.warn_txt_2) }
+                                    3 -> { stringResource(R.string.warn_txt_3) }
+                                    else -> { stringResource(R.string.warn_txt_0) }
+                                })
+                                },
+                                confirmButton = {
+                                    TextButton(
+                                        onClick = { attemptNum++; showDialog = false }, 
+                                        content = { Text(text = "OK") }
+                                    )
+                                }
+                            )
+                        }
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()

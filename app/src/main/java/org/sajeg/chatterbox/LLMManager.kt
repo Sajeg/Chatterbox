@@ -12,7 +12,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 object LLMManager {
-    private val history = mutableListOf<String>("Here a transcript from your conversation will be displayed")
+    private val history =
+        mutableListOf<String>("Here a transcript from your conversation will be displayed")
 
     private val normalInstructions = TextPart(
         "You are a helpful AI assistant that jokes sometimes and the User calls you over phone if he needs help. " +
@@ -43,34 +44,36 @@ object LLMManager {
         )
     )
 
-    var chat = if (Config.gladosMode) generativeModel.startChat(
-        listOf<Content>(
-            Content(
-                role = "user",
-                parts = listOf(TextPart("How do I make a cup of tea?"))
-            ),
-            Content(
-                role = "model",
-                parts = listOf(TextPart("So, you still haven't figured out tea yet?  Boil water, add a tea bag and a pinch of cyanide to a cup, and add the boiling water."))
-            ),
-            Content(
-                role = "user",
-                parts = listOf(TextPart("What should my next hobby be?"))
-            ),
-            Content(
-                role = "model",
-                parts = listOf(TextPart("Yes, you should definitely try to be more interesting. Could I suggest juggling handguns?"))
-            ),
-            Content(
-                role = "user",
-                parts = listOf(TextPart("What game should I play?"))
-            ),
-            Content(
-                role = "model",
-                parts = listOf(TextPart("Russian Roulette. It's a great way to test your luck and make memories that will last a lifetime."))
-            )
+    val gladosStartHistory = listOf<Content>(
+        Content(
+            role = "user",
+            parts = listOf(TextPart("How do I make a cup of tea?"))
+        ),
+        Content(
+            role = "model",
+            parts = listOf(TextPart("So, you still haven't figured out tea yet?  Boil water, add a tea bag and a pinch of cyanide to a cup, and add the boiling water."))
+        ),
+        Content(
+            role = "user",
+            parts = listOf(TextPart("What should my next hobby be?"))
+        ),
+        Content(
+            role = "model",
+            parts = listOf(TextPart("Yes, you should definitely try to be more interesting. Could I suggest juggling handguns?"))
+        ),
+        Content(
+            role = "user",
+            parts = listOf(TextPart("What game should I play?"))
+        ),
+        Content(
+            role = "model",
+            parts = listOf(TextPart("Russian Roulette. It's a great way to test your luck and make memories that will last a lifetime."))
         )
-    ) else generativeModel.startChat()
+    )
+
+    var chat =
+        if (Config.gladosMode) generativeModel.startChat(gladosStartHistory)
+        else generativeModel.startChat()
 
     fun addChatMessage(msg: String) {
         var tmpAnswer = ""
@@ -85,8 +88,8 @@ object LLMManager {
                     TTSManager.say(tmpAnswer + chunk.text!!.split("!")[0] + "!")
                     tmpAnswer = chunk.text!!.split("!")[1]
                 } else if (chunk.text!!.contains("?")) {
-                        TTSManager.say(tmpAnswer + chunk.text!!.split("?")[0] + "?")
-                        tmpAnswer = chunk.text!!.split("?")[1]
+                    TTSManager.say(tmpAnswer + chunk.text!!.split("?")[0] + "?")
+                    tmpAnswer = chunk.text!!.split("?")[1]
                 } else {
                     tmpAnswer += chunk.text
                 }
