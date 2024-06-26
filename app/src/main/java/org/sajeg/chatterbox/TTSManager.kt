@@ -33,10 +33,8 @@ object TTSManager {
         tts.setAudioAttributes(audioAttributes)
         if (Config.gladosMode) {
             tts.setLanguage(Locale.US)
-        } else if (Config.language.contains("de")){
-            tts.setLanguage(Locale.GERMAN)
         } else {
-            tts.setLanguage(Locale.US)
+            tts.setLanguage(Locale.forLanguageTag(Config.language))
         }
         tts.speak(msg, TextToSpeech.QUEUE_ADD, null, "MODEL_MESSAGE")
     }

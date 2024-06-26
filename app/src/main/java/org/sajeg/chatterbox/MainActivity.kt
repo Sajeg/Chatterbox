@@ -261,16 +261,15 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.height(160.dp)
                             ) {
                                 item {
-                                    val shortNames = arrayOf("de", "en", "fr", "it", "es", "jp")
+                                    val shortNames = arrayOf("de", "en", "fr", "it", "es")
                                     val longNames = arrayOf(
                                         R.string.german,
                                         R.string.english,
                                         R.string.french,
                                         R.string.italian,
                                         R.string.spanish,
-                                        R.string.japanese
                                     )
-                                    for (i in 0..5) {
+                                    for (i in 0..4) {
                                         var cardColor = CardDefaults.cardColors()
                                         if (Config.language == shortNames[i]) {
                                             cardColor = CardDefaults.cardColors(
@@ -282,7 +281,8 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier.fillMaxWidth(),
                                             colors = cardColor,
                                             onClick = {
-                                                Config.language = shortNames[i]; language = shortNames[i]
+                                                Config.language = shortNames[i]; language =
+                                                shortNames[i]; languageSelectorActivated = false
                                             },
                                             content = {
                                                 Text(
@@ -469,7 +469,8 @@ class MainActivity : ComponentActivity() {
                                 checked = callOnGoing,
                                 onCheckedChange = {
                                     callOnGoing = it; Config.call = it; Config.microphone =
-                                    it; microphoneOn = it
+                                    it; microphoneOn = it; if (!it) subtitlesActivated =
+                                    false; languageSelectorActivated = false; info = false
                                 },
                                 content = {
                                     if (callOnGoing) {
