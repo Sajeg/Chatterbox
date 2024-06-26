@@ -470,7 +470,7 @@ class MainActivity : ComponentActivity() {
                                     callOnGoing = it; Config.call = it; Config.microphone =
                                     it; microphoneOn = it; if (!it) subtitlesActivated =
                                     false; languageSelectorActivated = false; info =
-                                    false; SpeechManager.stopRecognition()
+                                    false; SpeechManager.stopRecognition(); TTSManager.stop()
                                 },
                                 content = {
                                     if (callOnGoing) {

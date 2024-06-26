@@ -39,6 +39,9 @@ object TTSManager {
         tts.speak(msg, TextToSpeech.QUEUE_ADD, null, "MODEL_MESSAGE")
     }
 
+    fun stop() {
+        tts.stop()
+    }
     fun isSpeaking(): Boolean {
         return tts.isSpeaking
     }
