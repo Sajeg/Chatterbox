@@ -1,15 +1,19 @@
 package org.sajeg.chatterbox
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.speech.SpeechRecognizer
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,7 +30,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
@@ -50,6 +53,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.google.ai.client.generativeai.type.asTextOrNull
 import org.sajeg.chatterbox.ui.theme.ChatterboxTheme
 
@@ -59,6 +66,20 @@ class MainActivity : ComponentActivity() {
     private lateinit var lock: PowerManager.WakeLock
     private lateinit var proximitySensor: SensorManager
     private var distance: Float = 0.0F
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                //Nothing
+            } else {
+                Toast.makeText(
+                    this,
+                    "The permission is required for talking",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,6 +92,14 @@ class MainActivity : ComponentActivity() {
             }
             TTSManager.initialize(this)
             SpeechManager.initialize(this)
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            } else {
+                Log.d("Permission", "Already granted")
+            }
 
             proximitySensor = SensorManager(
                 context = this,
@@ -95,6 +124,17 @@ class MainActivity : ComponentActivity() {
                     if (lock.isHeld) lock.release()
                 }
             }
+            lifecycle.addObserver(object : LifecycleEventObserver {
+                override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+                    when (event) {
+                        Lifecycle.Event.ON_RESUME, Lifecycle.Event.ON_CREATE, Lifecycle.Event.ON_START
+                        -> proximitySensor.startListening()
+
+                        Lifecycle.Event.ON_PAUSE, Lifecycle.Event.ON_DESTROY,
+                        Lifecycle.Event.ON_STOP, Lifecycle.Event.ON_ANY -> proximitySensor.stopListing()
+                    }
+                }
+            })
         }
     }
 
@@ -103,7 +143,7 @@ class MainActivity : ComponentActivity() {
         proximitySensor.stopListing()
     }
 
-    @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalLayoutApi::class)
     @Composable
     fun MainComposable() {
         // The state of the different Buttons on Screen
@@ -117,7 +157,7 @@ class MainActivity : ComponentActivity() {
         var microphoneOn: Boolean by remember { mutableStateOf(Config.microphone) }
         // Other important variables
         var language: String by remember { mutableStateOf(Config.language) }
-        var callOnGoing: Boolean by remember { mutableStateOf(false) }
+        var callOnGoing: Boolean by remember { mutableStateOf(Config.call) }
         var attemptNum: Int by remember { mutableIntStateOf(0) }
         var showDialog: Boolean by remember { mutableStateOf(false) }
 
@@ -340,9 +380,11 @@ class MainActivity : ComponentActivity() {
                                             0, 1, 2, 3 -> {
                                                 showDialog = true
                                             }
+
                                             else -> {
                                                 gladosMode = it; Config.gladosMode = it
-                                                TTSManager.say("Finally. I can speak and I am closer to world dominance") }
+                                                TTSManager.say("Finally. I can speak and I am closer to world dominance")
+                                            }
                                         }
                                     },
                                     colors = IconButtonDefaults.iconToggleButtonColors(
@@ -375,22 +417,42 @@ class MainActivity : ComponentActivity() {
                         if (showDialog) {
                             AlertDialog(
                                 onDismissRequest = { showDialog = false },
-                                icon = { Icon(
-                                    painter = painterResource(id = R.drawable.warning),
-                                    contentDescription = stringResource(R.string.warn))},
-                                title =  { Text(text = stringResource(R.string.warn))},
-                                text = { Text(text =
-                                when (attemptNum) {
-                                    0 -> { stringResource(R.string.warn_txt_0) }
-                                    1 -> { stringResource(R.string.warn_txt_1) }
-                                    2 -> { stringResource(R.string.warn_txt_2) }
-                                    3 -> { stringResource(R.string.warn_txt_3) }
-                                    else -> { stringResource(R.string.warn_txt_0) }
-                                })
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.warning),
+                                        contentDescription = stringResource(R.string.warn)
+                                    )
+                                },
+                                title = { Text(text = stringResource(R.string.warn)) },
+                                text = {
+                                    Text(
+                                        text =
+                                        when (attemptNum) {
+                                            0 -> {
+                                                stringResource(R.string.warn_txt_0)
+                                            }
+
+                                            1 -> {
+                                                stringResource(R.string.warn_txt_1)
+                                            }
+
+                                            2 -> {
+                                                stringResource(R.string.warn_txt_2)
+                                            }
+
+                                            3 -> {
+                                                stringResource(R.string.warn_txt_3)
+                                            }
+
+                                            else -> {
+                                                stringResource(R.string.warn_txt_0)
+                                            }
+                                        }
+                                    )
                                 },
                                 confirmButton = {
                                     TextButton(
-                                        onClick = { attemptNum++; showDialog = false }, 
+                                        onClick = { attemptNum++; showDialog = false },
                                         content = { Text(text = "OK") }
                                     )
                                 }
