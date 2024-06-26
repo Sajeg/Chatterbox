@@ -1,9 +1,11 @@
 package org.sajeg.chatterbox
 
+import android.os.Build
 import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.SpeechRecognizer
 import android.util.Log
+import androidx.annotation.RequiresApi
 
 class AnswerRecognitionListener : RecognitionListener {
 
@@ -27,9 +29,13 @@ class AnswerRecognitionListener : RecognitionListener {
         // Called when speech ends
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onError(error: Int) {
         // Called when an error occurs
         Log.e("RecognitionListener", "Error Recognizing Speech. ERROR CODE: $error")
+        if (error == 13 && Build.VERSION.SDK_INT >= 33) {
+            SpeechManager.downloadModel()
+        }
         Config.microphone = false
     }
 

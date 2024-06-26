@@ -31,10 +31,12 @@ object TTSManager {
         }
         tts.setOnUtteranceProgressListener(TTSProgress())
         tts.setAudioAttributes(audioAttributes)
-        if (Config.gladosMode || Config.language == "en-US") {
+        if (Config.gladosMode) {
             tts.setLanguage(Locale.US)
-        } else {
+        } else if (Config.language.contains("de")){
             tts.setLanguage(Locale.GERMAN)
+        } else {
+            tts.setLanguage(Locale.US)
         }
         tts.speak(msg, TextToSpeech.QUEUE_ADD, null, "MODEL_MESSAGE")
     }

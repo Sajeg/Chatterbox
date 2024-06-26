@@ -15,4 +15,8 @@
     <string name="warn_txt_3" >This is a mistake</string>
     <string name="warn_txt_2" >It is highly recommend to not press this Button</string>
     <string name="start_desc">To Start a call hold the phone to your ear or press the button and start speaking</string>
+    <string name="french">French</string>
+    <string name="italian">Italian</string>
+    <string name="spanish">Spanish</string>
+    <string name="japanese">Japanese</string>
 </resources>

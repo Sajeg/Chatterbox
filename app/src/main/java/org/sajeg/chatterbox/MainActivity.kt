@@ -30,14 +30,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -143,7 +141,7 @@ class MainActivity : ComponentActivity() {
         proximitySensor.stopListing()
     }
 
-    @OptIn(ExperimentalLayoutApi::class)
+    @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
     @Composable
     fun MainComposable() {
         // The state of the different Buttons on Screen
@@ -263,36 +261,38 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.height(160.dp)
                             ) {
                                 item {
-                                    ListItem(
-                                        leadingContent = {
-                                            RadioButton(
-                                                selected = language == "en-US",
-                                                onClick = {
-                                                    Config.language = "en-US"; language =
-                                                    "en-US"
-                                                })
-                                        },
-                                        headlineContent = { Text(text = stringResource(R.string.english)) },
-                                        colors = ListItemDefaults.colors(
-                                            containerColor = MaterialTheme.colorScheme.secondaryContainer
-                                        )
+                                    val shortNames = arrayOf("de", "en", "fr", "it", "es", "jp")
+                                    val longNames = arrayOf(
+                                        R.string.german,
+                                        R.string.english,
+                                        R.string.french,
+                                        R.string.italian,
+                                        R.string.spanish,
+                                        R.string.japanese
                                     )
-                                }
-                                item {
-                                    ListItem(
-                                        leadingContent = {
-                                            RadioButton(
-                                                selected = language == "de-DE",
-                                                onClick = {
-                                                    Config.language = "de-DE"; language =
-                                                    "de-DE"
-                                                })
-                                        },
-                                        headlineContent = { Text(text = stringResource(R.string.german)) },
-                                        colors = ListItemDefaults.colors(
-                                            containerColor = MaterialTheme.colorScheme.secondaryContainer
+                                    for (i in 0..5) {
+                                        var cardColor = CardDefaults.cardColors()
+                                        if (Config.language == shortNames[i]) {
+                                            cardColor = CardDefaults.cardColors(
+                                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                                contentColor = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
+                                        Card(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            colors = cardColor,
+                                            onClick = {
+                                                Config.language = shortNames[i]; language = shortNames[i]
+                                            },
+                                            content = {
+                                                Text(
+                                                    modifier = Modifier.padding(10.dp),
+                                                    text = stringResource(id = longNames[i])
+                                                )
+                                            }
                                         )
-                                    )
+
+                                    }
                                 }
                             }
                         }
