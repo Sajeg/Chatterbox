@@ -114,10 +114,9 @@ class MainActivity : ComponentActivity() {
             proximitySensor.setOnSensorValuesChangedListener { values ->
                 distance = values[0]
                 Log.d("SensorData", distance.toString())
-                if (distance == 0.0F && !TTSManager.isSpeaking()) {
+                if (distance == 0.0F && !TTSManager.isSpeaking() && Config.call) {
                     if (!lock.isHeld) lock.acquire(10 * 60 * 1000L)
                     Config.microphone = true
-                    Config.call = true
                 } else {
                     if (lock.isHeld) lock.release()
                 }
@@ -470,7 +469,8 @@ class MainActivity : ComponentActivity() {
                                 onCheckedChange = {
                                     callOnGoing = it; Config.call = it; Config.microphone =
                                     it; microphoneOn = it; if (!it) subtitlesActivated =
-                                    false; languageSelectorActivated = false; info = false
+                                    false; languageSelectorActivated = false; info =
+                                    false; SpeechManager.stopRecognition()
                                 },
                                 content = {
                                     if (callOnGoing) {

@@ -51,8 +51,8 @@ object SpeechManager {
         stt.triggerModelDownload(intent)
     }
 
-//    fun stopRecognition() {
-//        stt.stopListening()
-//    }
+    fun stopRecognition() {
+        stt.stopListening()
+    }
 }
 

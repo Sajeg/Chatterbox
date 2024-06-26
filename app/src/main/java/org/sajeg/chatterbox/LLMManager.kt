@@ -76,26 +76,34 @@ object LLMManager {
         else generativeModel.startChat()
 
     fun addChatMessage(msg: String) {
-        var tmpAnswer = ""
-        val i = history.size - 1
+//        var tmpAnswer = ""
+//        val i = history.size - 1
 
         CoroutineScope(Dispatchers.IO).launch {
-            chat.sendMessageStream(msg).collect { chunk ->
-                if (chunk.text!!.contains(".")) {
-                    TTSManager.say(tmpAnswer + chunk.text!!.split(".")[0] + ".")
-                    tmpAnswer = chunk.text!!.split(".")[1]
-                } else if (chunk.text!!.contains("!")) {
-                    TTSManager.say(tmpAnswer + chunk.text!!.split("!")[0] + "!")
-                    tmpAnswer = chunk.text!!.split("!")[1]
-                } else if (chunk.text!!.contains("?")) {
-                    TTSManager.say(tmpAnswer + chunk.text!!.split("?")[0] + "?")
-                    tmpAnswer = chunk.text!!.split("?")[1]
-                } else {
-                    tmpAnswer += chunk.text
-                }
-                //TTSManager.say(chunk.text!!)
-                history[i] = history[i] + chunk.text!!
-            }
+            TTSManager.say(chat.sendMessage(msg).text!!.replace(Regex("[\\u2000-\\u3300]"), ""))
+//            chat.sendMessageStream(msg).collect { chunk ->
+//                var text = tmpAnswer + chunk.text!!
+//                Log.d("Received", chunk.text!!)
+//                if (text.contains(".")) {
+//                    TTSManager.say(text.split(".")[0] + ".")
+//                    Log.d("Saying", chunk.text!!.split(".")[0] + ".")
+//                    text = text.split(".")[1]
+//                }
+//                if (text.contains("!")) {
+//                    TTSManager.say(text.split("!")[0] + "!")
+//                    text = text.split("!")[1]
+//                    Log.d("Saying", chunk.text!!.split("!")[0] + "!")
+//                }
+//                if (text.contains("?")) {
+//                    TTSManager.say(text.split("?")[0] + "?")
+//                    text = text.split("?")[1]
+//                    Log.d("Saying", chunk.text!!.split("?")[0] + "?")
+//                }
+//                Log.d("Storing", text)
+//                tmpAnswer = text
+////                TTSManager.say(chunk.text!!)
+//                history[i] = history[i] + chunk.text!!
+//            }
         }
     }
 
